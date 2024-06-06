@@ -3,7 +3,7 @@ from CustomJWTAuth.models import *
 from django.utils.encoding import smart_str, force_bytes, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-
+from CustomJWTAuth.utils import *
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style = {'input_type':'password'}, write_only=True)
     class Meta:
@@ -65,7 +65,14 @@ class SendPasswordResetEmailSerializer(serializers.Serializer):
             print('Password Reset Token', token)
             link = 'http://localhost:3000/api/v1/user/reset/'+uid+'/'+token
             print('Password Reset Link', link)   
-            #Send Email          
+            #Send Email 
+            body = "Click Following Link to Reset Your Password"+link
+            data = {
+                "subject":"Reset Your Password",
+                "body":body,
+                "to_email":user.email
+            }  
+            Util.send_email(data) 
             return data
         else:
             raise serializers.ValidationError("Your are not a Registered User")
